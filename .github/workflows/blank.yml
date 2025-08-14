@@ -1,0 +1,35 @@
+name: Build APK from ZIP
+
+on:
+  workflow_dispatch:  # lets you run manually
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install unzip
+        run: sudo apt-get install -y unzip
+
+      - name: Unzip project
+        run: unzip birthday-reminder-app.zip -d .
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: birthday-reminder-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
